@@ -1,0 +1,36 @@
+
+services:
+  rabbit_mq:
+    container_name: rabbit_mq
+    image: rabbitmq:4.1.0-management
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - ./shared:/app/data
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+  celery:
+    build:
+      context: ./celery          
+      dockerfile: Dockerfile     
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./shared:/app/data       
+    container_name: celery_worker
+    depends_on:
+      - rabbit_mq
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+
+      

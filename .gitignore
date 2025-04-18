@@ -5,3 +5,4 @@
 celery/venv/*
 *venv*
 *pycache*
+!docker-compose.yaml

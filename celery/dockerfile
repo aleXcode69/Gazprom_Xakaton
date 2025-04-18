@@ -1,22 +1,18 @@
-FROM python:3.13-alpine
+FROM python:3.13
 
-
-ENV PYTHONUNBUFFERED=1
-
-
+# Переназначим рабочую папку
 WORKDIR /app
 
-
+# Скопировать только requirements (чтобы не пересобирать pip при каждом изменении кода)
 COPY requirements.txt .
 
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir celery
+# Скопировать весь оставшийся код
+COPY . .
 
-COPY app.py .
-COPY producer.py .
-COPY tasks.py .
-COPY api.py .
-COPY entrypoint.sh .
+# Сделать entrypoint.sh исполняемым (если нужно)
+RUN chmod +x entrypoint.sh
 
-
-CMD ["./entrypoint.sh"]
+# Запуск при старте контейнера
+ENTRYPOINT ["./entrypoint.sh"]

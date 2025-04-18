@@ -6,3 +6,4 @@ celery/venv/*
 *venv*
 *pycache*
 !docker-compose.yaml
+!.env.example

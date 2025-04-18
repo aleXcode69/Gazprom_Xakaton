@@ -1,0 +1,7 @@
+*
+!.gitignore
+!celery/
+!celery/**
+celery/venv/*
+*venv*
+*pycache*

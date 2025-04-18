@@ -1,0 +1,18 @@
+FROM python:3.13-alpine
+
+
+ENV PYTHONUNBUFFERED=1
+
+
+WORKDIR /app
+
+
+COPY requirements.txt .
+
+
+RUN pip install --no-cache-dir celery
+
+COPY app.py .
+COPY producer.py .
+COPY tasks.py .
+CMD ["celery", "-A", "celery.app", "worker", "--loglevel=info", "--concurrency=4"]

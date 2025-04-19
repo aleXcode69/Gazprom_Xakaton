@@ -374,6 +374,6 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=80,
-        ssl_certfile="./CERTS/fullchain.pem",  # Correct path to the certificate
-        ssl_keyfile="./CERTS/privkey.pem"     # Correct path to the private key
+        ssl_certfile="/fastapi/CERTS/fullchain.pem",  # Use absolute path to certificate
+        ssl_keyfile="/fastapi/CERTS/privkey.pem"        # Use absolute path to private key
     )

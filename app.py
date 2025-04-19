@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 import json
 import networkx as nx
 import requests
+from config import OpenRouterConfig
 
 app = FastAPI()
 
@@ -20,30 +21,39 @@ templates = Jinja2Templates(directory="templates")
 processed_data = {}
 current_analysis = {}
 
-# API ключ OpenRouter
-OPENROUTER_API_KEY = "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"
+def make_openrouter_request(url: str, data: dict) -> Optional[dict]:
+    for attempt in range(OpenRouterConfig.MAX_RETRIES):
+        try:
+            headers = {
+                "Authorization": f"Bearer {OpenRouterConfig.get_current_key()}",
+                "Content-Type": "application/json"
+            }
+            
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            return response.json()
+            
+        except requests.exceptions.RequestException as e:
+            if attempt < OpenRouterConfig.MAX_RETRIES - 1:
+                # Ротируем ключ при ошибке
+                OpenRouterConfig.rotate_key()
+                continue
+            raise e
 
 async def get_ai_response(messages):
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
     data = {
         "model": "openai/gpt-3.5-turbo",
         "messages": messages
     }
-    
-    response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers=headers,
-        json=data
-    )
-    
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        raise Exception(f"Ошибка API: {response.status_code} - {response.text}")
+
+    try:
+        response = make_openrouter_request(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data
+        )
+        return response["choices"][0]["message"]["content"]
+    except Exception as e:
+        raise Exception(f"Ошибка API: {str(e)}")
 
 
 def find_partial_duplicates(df: pd.DataFrame, column: str) -> Tuple[int, int, List[pd.DataFrame], List]:

@@ -1,44 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Результаты анализа</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты анализа | Газпром</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="icon" href="/static/favicon.ico">
 </head>
 <body>
+    <button class="download-pdf-btn" onclick="downloadPDF()">Скачать PDF</button>
     <div class="container">
-        <h1>Результаты анализа данных: {{ filename }}</h1>
+        <!-- Шапка с логотипом -->
+        <div class="header">
+            <img src="/static/ALLlogo.svg" alt="Газпром" class="logo">
+            <div class="header-title">
+                <h1>Результаты анализа данных</h1>
+                <div class="file-info">{{ filename }} • {{ file_size_kb }} KB</div>
+            </div>
+        </div>
 
-        <div class="section">
-            <h2>Общая информация</h2>
+        <!-- Основные метрики -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 8V16" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 12H16" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Общая информация
+            </h2>
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <div class="metric-value">{{ file_size_kb }} KB</div>
-                    <div class="metric-label">Размер файла</div>
-                </div>
-                <div class="metric-card">
                     <div class="metric-value">{{ row_count }}</div>
-                    <div class="metric-label">Количество строк</div>
+                    <div class="metric-label">Строк данных</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-value">{{ col_count }}</div>
-                    <div class="metric-label">Количество столбцов</div>
+                    <div class="metric-label">Столбцов</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_missing }}</div>
+                    <div class="metric-label">Пропущенных значений</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ full_duplicates }}</div>
+                    <div class="metric-label">Полных дубликатов</div>
                 </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Визуализация качества данных</h2>
-            <div id="qualityChart"></div>
+        <!-- Визуализация качества данных -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 20V10" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 20V4" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 20V14" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Визуализация качества данных
+            </h2>
+            <div class="chart-container">
+                <div id="qualityChart"></div>
+            </div>
         </div>
 
-        <div class="section">
-            <h2>Наименее уникальные значения</h2>
-            <div id="unpopularGraph"></div>
+        <!-- Наименее уникальные значения -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12C16 14.21 14.21 16 12 16C9.79 16 8 14.21 8 12Z" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 2V12" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Наименее уникальные значения
+            </h2>
+            <div class="chart-container">
+                <div id="unpopularGraph"></div>
+            </div>
         </div>
 
-        <div class="section">
-            <h2>Пропущенные значения</h2>
+        <!-- Пропущенные значения -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 12H16" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Пропущенные значения
+            </h2>
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-value">{{ total_missing }}</div>
@@ -50,51 +102,65 @@
                 </div>
             </div>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Столбец</th>
-                        <th>Пропущено</th>
-                        <th>% пропущено</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for col, count, pct in missing_values %}
-                    <tr>
-                        <td>{{ col }}</td>
-                        <td>{{ count }}</td>
-                        <td>{{ "%.2f"|format(pct) }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Столбец</th>
+                            <th>Пропущено</th>
+                            <th>% пропущено</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for col, count, pct in missing_values %}
+                        <tr>
+                            <td>{{ col }}</td>
+                            <td>{{ count }}</td>
+                            <td>{{ "%.2f"|format(pct) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="section">
-            <h2>Дубликаты</h2>
+        <!-- Дубликаты -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 7H21V21H7V17" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 3H3V17H17V3Z" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Дубликаты
+            </h2>
+            
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-value">{{ full_duplicates }}</div>
                     <div class="metric-label">Полных дубликатов</div>
                     {% if full_duplicates > 0 %}
-                    <form action="/process_duplicates" method="post">
+                    <form action="/process_duplicates" method="post" style="margin-top: 15px;">
                         <input type="hidden" name="filename" value="{{ filename }}">
                         <input type="hidden" name="action" value="remove_full">
-                        <button type="submit" class="action-button">Удалить дубликаты</button>
+                        <button type="submit" class="merge-button">
+                            Удалить дубликаты
+                        </button>
                     </form>
                     {% endif %}
                 </div>
             </div>
 
             <div class="subsection">
-                <h3>Частичные дубликаты</h3>
+                <h3 class="section-title" style="font-size: 18px; margin-bottom: 15px;">
+                    Частичные дубликаты
+                </h3>
+                
                 {% for col_info in partial_duplicates_info %}
                 <div class="duplicate-section">
                     <div class="duplicate-header">
                         <h4>{{ col_info.column }}</h4>
-                        <div class="duplicate-stats">
-                            <span>{{ col_info.duplicate_groups }} групп</span>
-                            <span>{{ col_info.duplicate_rows }} строк</span>
+                        <div class="badge badge-primary">
+                            {{ col_info.duplicate_groups }} групп • {{ col_info.duplicate_rows }} строк
                         </div>
                     </div>
 
@@ -105,7 +171,7 @@
 
                         <div class="form-group">
                             <label>Стратегия объединения:</label>
-                            <select name="merge_strategy" class="merge-select" id="merge_strategy_{{ loop.index }}">
+                            <select name="merge_strategy" class="form-control" id="merge_strategy_{{ loop.index }}">
                                 <option value="first">Первое значение</option>
                                 <option value="last">Последнее значение</option>
                                 <option value="concat">Объединить значения</option>
@@ -115,22 +181,24 @@
 
                         <div class="form-group" id="custom_value_container_{{ loop.index }}" style="display: none;">
                             <label>Значение для сохранения:</label>
-                            <select name="custom_value" class="value-select">
+                            <select name="custom_value" class="form-control">
                                 {% for value in col_info.duplicate_values %}
                                 <option value="{{ value }}">{{ value }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
-                        <button type="submit" class="merge-button">Объединить</button>
+                        <button type="submit" class="merge-button">
+                            Объединить
+                        </button>
                     </form>
 
                     {% if col_info.samples %}
                     <div class="samples-container">
                         <h5>Примеры дубликатов:</h5>
                         {% for sample in col_info.samples %}
-                        <div class="sample-table-container">
-                            <table class="sample-table">
+                        <div class="table-responsive">
+                            <table class="data-table">
                                 <thead>
                                     <tr>
                                         {% for col in sample.columns %}
@@ -153,7 +221,7 @@
                     </div>
                     {% endif %}
 
-                    <button class="ai-button" onclick="openAIChat('{{ filename }}', '{{ col_info.column }}')">
+                    <button class="primary-button ai-button" onclick="openAIChat('{{ filename }}', '{{ col_info.column }}')">
                         <span>Спросить у ИИ</span>
                     </button>
                 </div>
@@ -161,92 +229,132 @@
             </div>
         </div>
 
-        <!-- Модальное окно чата -->
-        <div id="aiChatModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <div class="chat-container">
-                    <div class="chat-messages" id="chatMessages"></div>
-                    <div class="chat-input">
-                        <input type="text" id="userMessage" placeholder="Введите ваше сообщение...">
-                        <button onclick="sendMessage()">Отправить</button>
-                    </div>
-                </div>
+        <!-- Статистика по столбцам -->
+        <div class="section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 21H6.2C5.07989 21 4.51984 21 4.09202 20.782C3.71569 20.5903 3.40973 20.2843 3.21799 19.908C3 19.4802 3 18.9201 3 17.8V3" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10L10 7L13 10L17 6" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 14L17 10L13 14L10 11" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Статистика по столбцам
+            </h2>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Столбец</th>
+                            <th>Тип данных</th>
+                            <th>Уникальных</th>
+                            <th>Пример</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for col, dtype, unique, sample in column_stats %}
+                        <tr {% if col in top_columns %}class="highlight-row"{% endif %}>
+                            <td>{{ col }}</td>
+                            <td><span class="badge badge-primary">{{ dtype }}</span></td>
+                            <td>{{ unique }}</td>
+                            <td>{{ sample }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="section">
-            <h2>Статистика по столбцам</h2>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Столбец</th>
-                        <th>Тип данных</th>
-                        <th>Уникальных</th>
-                        <th>Пример</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for col, dtype, unique, sample in column_stats %}
-                    <tr {% if col in top_columns %}class="highlight-row"{% endif %}>
-                        <td>{{ col }}</td>
-                        <td>{{ dtype }}</td>
-                        <td>{{ unique }}</td>
-                        <td>{{ sample }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
+        <!-- Скачивание обработанных данных -->
         {% if processed %}
-        <div class="section download-section">
-            <h2>Обработанные данные</h2>
+        <div class="section download-section slide-up">
+            <h2 class="section-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10L12 15L17 10" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 15V3" stroke="#0079C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Обработанные данные
+            </h2>
             <form action="/download" method="post">
                 <input type="hidden" name="filename" value="{{ filename }}">
-                <button type="submit" class="download-button">Скачать CSV</button>
+                <button type="submit" class="primary-button">
+                    Скачать CSV
+                </button>
             </form>
         </div>
         {% endif %}
 
-        <div class="back-link">
-            <a href="/" class="back-button">← Загрузить другой файл</a>
+        <!-- Кнопка возврата -->
+        <div class="back-link slide-up">
+            <a href="/" class="back-button">
+                ← Загрузить другой файл
+            </a>
+        </div>
+
+        <!-- Модальное окно чата -->
+        <div id="aiChatModal" class="modal fade-in">
+            <div class="modal-content slide-up">
+                <span class="close" onclick="closeChat()">&times;</span>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="userMessage" class="form-control" placeholder="Введите ваш вопрос...">
+                        <button class="primary-button" onclick="sendMessage()">Отправить</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        function downloadPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 1,
+                filename: 'результаты_анализа.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const pdfBtn = document.querySelector('.download-pdf-btn');
+            pdfBtn.style.display = 'none';
+            
+            html2pdf()
+                .set(opt)
+                .from(element)
+                .save()
+                .then(() => {
+                    pdfBtn.style.display = 'block';
+                });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализация диаграммы качества данных
             const chartData = JSON.parse('{{ quality_chart|safe }}');
-            Plotly.newPlot('qualityChart', chartData.data, chartData.layout, {responsive: true});
+            Plotly.newPlot('qualityChart', chartData.data, chartData.layout, {
+                responsive: true,
+                displaylogo: false
+            });
 
-            // Инициализация графа наименее уникальных значений
             const unpopularGraphData = JSON.parse('{{ unpopular_graph|safe }}');
-            Plotly.newPlot('unpopularGraph', unpopularGraphData.data, unpopularGraphData.layout);
+            Plotly.newPlot('unpopularGraph', unpopularGraphData.data, unpopularGraphData.layout, {
+                responsive: true,
+                displaylogo: false
+            });
 
-            // Функция для переключения видимости поля выбора значения
-            function toggleCustomValue(selectElement, index) {
-                const container = document.getElementById(`custom_value_container_${index}`);
-                if (selectElement.value === 'custom') {
-                    container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
-                }
-            }
-
-            // Инициализация всех полей выбора
             document.querySelectorAll('[id^="merge_strategy_"]').forEach(select => {
                 const index = select.id.split('_')[2];
                 toggleCustomValue(select, index);
-
-                // Добавляем обработчик изменения
                 select.addEventListener('change', function() {
                     toggleCustomValue(this, index);
                 });
             });
+
+            function toggleCustomValue(select, index) {
+                const container = document.getElementById(`custom_value_container_${index}`);
+                container.style.display = select.value === 'custom' ? 'block' : 'none';
+            }
         });
 
-        // Функции для работы с чатом ИИ
         let currentFilename = '';
         let currentColumn = '';
 
@@ -257,10 +365,8 @@
             document.getElementById('chatMessages').innerHTML = '';
             document.getElementById('userMessage').value = '';
             
-            // Добавляем индикатор загрузки
-            addLoadingIndicator();
+            showLoading();
             
-            // Отправляем первый запрос
             fetch('/ask_ai', {
                 method: 'POST',
                 headers: {
@@ -273,19 +379,16 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Удаляем индикатор загрузки
-                removeLoadingIndicator();
-                
+                hideLoading();
                 if (data.error) {
-                    alert(data.error);
-                    return;
+                    showError(data.error);
+                } else {
+                    addMessage(data.response, 'ai');
                 }
-                addMessage(data.response, 'ai');
             })
             .catch(error => {
-                // Удаляем индикатор загрузки в случае ошибки
-                removeLoadingIndicator();
-                alert('Произошла ошибка: ' + error);
+                hideLoading();
+                showError('Ошибка соединения: ' + error.message);
             });
         }
 
@@ -297,35 +400,13 @@
             const messagesDiv = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function addLoadingIndicator() {
-            const messagesDiv = document.getElementById('chatMessages');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message ai';
-            loadingDiv.id = 'loadingIndicator';
-            loadingDiv.innerHTML = `
+            messageDiv.innerHTML = `
                 <div class="message-content">
-                    <div class="loading-text">Подождите ответа...</div>
-                    <div class="loading-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                    ${text.replace(/\n/g, '<br>')}
                 </div>
             `;
-            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function removeLoadingIndicator() {
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            if (loadingIndicator) {
-                loadingIndicator.remove();
-            }
         }
 
         function sendMessage() {
@@ -335,9 +416,7 @@
 
             addMessage(message, 'user');
             input.value = '';
-            
-            // Добавляем индикатор загрузки
-            addLoadingIndicator();
+            showLoading();
 
             fetch('/ask_ai', {
                 method: 'POST',
@@ -352,34 +431,58 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Удаляем индикатор загрузки
-                removeLoadingIndicator();
-                
+                hideLoading();
                 if (data.error) {
-                    alert(data.error);
-                    return;
+                    showError(data.error);
+                } else {
+                    addMessage(data.response, 'ai');
                 }
-                addMessage(data.response, 'ai');
             })
             .catch(error => {
-                // Удаляем индикатор загрузки в случае ошибки
-                removeLoadingIndicator();
-                alert('Произошла ошибка: ' + error);
+                hideLoading();
+                showError('Ошибка соединения: ' + error.message);
             });
         }
 
-        // Закрытие модального окна при клике на крестик
-        document.querySelector('.close').addEventListener('click', closeChat);
+        function showLoading() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai';
+            loadingDiv.id = 'loadingIndicator';
+            loadingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="loading-spinner"></div>
+                    <span>Анализируем данные...</span>
+                </div>
+            `;
+            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
 
-        // Закрытие модального окна при клике вне его
+        function hideLoading() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) loadingIndicator.remove();
+        }
+
+        function showError(message) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'message error';
+            errorDiv.innerHTML = `
+                <div class="message-content">
+                    ⚠️ ${message}
+                </div>
+            `;
+            messagesDiv.appendChild(errorDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
         window.addEventListener('click', function(event) {
-            const modal = document.getElementById('aiChatModal');
-            if (event.target == modal) {
+            if (event.target === document.getElementById('aiChatModal')) {
                 closeChat();
             }
         });
 
-        // Отправка сообщения по Enter
         document.getElementById('userMessage').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();

@@ -1,19 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Анализатор качества данных CSV</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализатор качества данных CSV | Газпром</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Загрузите CSV-файл для анализа</h1>
-        <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
-            <div class="form-group">
-                <label for="file">Выберите CSV файл:</label>
-                <input type="file" name="file" id="file" accept=".csv" required>
+    <div class="upload-container">
+        <div class="upload-card">
+            <div class="logo-container">
+                <img src="/static/ALLlogo.svg" alt="Газпром" class="gazprom-logo">
             </div>
-            <button type="submit" class="upload-button">Анализировать</button>
-        </form>
+            
+            <div class="upload-header">
+                <h1><span class="highlight">Анализатор</span> CSV-данных</h1>
+                <p class="subtitle">Загрузите файл для проверки качества информации</p>
+            </div>
+            
+            <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
+                <div class="file-upload-wrapper" id="drop-zone">
+                    <label for="file" class="file-upload-label">
+                        <svg class="upload-icon" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        <span class="file-upload-text">Выберите CSV файл</span>
+                        <span class="file-upload-hint">или перетащите его сюда</span>
+                    </label>
+                    <input type="file" name="file" id="file" accept=".csv" required class="file-input">
+                    
+                    <div class="file-selected" id="file-selected">
+                        <span class="file-name" id="file-name">Файл не выбран</span>
+                        <button type="button" class="clear-file" id="clear-file">×</button>
+                    </div>
+                </div>
+                
+                <div class="error-message" id="error-message"></div>
+                
+                <div class="form-footer">
+                    <button type="submit" class="upload-button">
+                        <span class="button-text">Анализировать данные</span>
+                        <span class="button-icon">→</span>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="upload-features">
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <p>Контроль качества</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <p>Выявление дубликатов</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📈</div>
+                    <p>Визуальная аналитика</p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const fileName = document.getElementById('file-name');
+        const fileSelected = document.getElementById('file-selected');
+        const clearFile = document.getElementById('clear-file');
+        const dropZone = document.getElementById('drop-zone');
+        const errorMessage = document.getElementById('error-message');
+        const form = document.querySelector('.upload-form');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                fileName.textContent = e.target.files[0].name;
+                fileSelected.style.display = 'flex';
+                errorMessage.style.display = 'none';
+            }
+        });
+
+        clearFile.addEventListener('click', () => {
+            fileInput.value = '';
+            fileName.textContent = 'Файл не выбран';
+            fileSelected.style.display = 'none';
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('drag-over');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length) {
+                const file = files[0];
+                if (file.name.endsWith('.csv') || file.type === 'text/csv') {
+                    fileInput.files = files;
+                    fileName.textContent = file.name;
+                    fileSelected.style.display = 'flex';
+                    errorMessage.style.display = 'none';
+                } else {
+                    showError('Пожалуйста, загрузите файл в формате CSV');
+                }
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            if (!fileInput.files.length) {
+                e.preventDefault();
+                showError('Пожалуйста, загрузите файл перед анализом');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </body>
 </html>

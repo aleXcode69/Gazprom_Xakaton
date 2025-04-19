@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Анализатор качества данных CSV</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Загрузите CSV-файл для анализа</h1>
+        <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="form-group">
+                <label for="file">Выберите CSV файл:</label>
+                <input type="file" name="file" id="file" accept=".csv" required>
+            </div>
+            <button type="submit" class="upload-button">Анализировать</button>
+        </form>
+    </div>
+</body>
+</html>

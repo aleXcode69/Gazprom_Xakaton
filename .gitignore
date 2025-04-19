@@ -1,9 +1,3 @@
-*
-!.gitignore
-!celery/
-!celery/**
-celery/venv/*
+.env
 *venv*
-*pycache*
-!docker-compose.yaml
-!.env.example
+*cache*

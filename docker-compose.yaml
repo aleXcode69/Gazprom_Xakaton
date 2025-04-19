@@ -1,4 +1,3 @@
-
 services:
   rabbit_mq:
     container_name: rabbit_mq
@@ -17,7 +16,6 @@ services:
       timeout: 10s
       retries: 5
 
-
   celery:
     build:
       context: ./celery          
@@ -33,4 +31,9 @@ services:
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
 
-      
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"

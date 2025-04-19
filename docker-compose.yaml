@@ -36,4 +36,4 @@ services:
       context: ./fastapi
       dockerfile: Dockerfile
     ports:
-      - "80:8001"
+      - "80:80"

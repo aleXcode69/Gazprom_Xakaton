@@ -369,10 +369,11 @@ if __name__ == "__main__":
 
     os.makedirs("static", exist_ok=True)
     os.makedirs("templates", exist_ok=True)
+
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=80,
-        ssl_certfile="./CERTS/fullchain.pem",  # Path to your certificate
-        ssl_keyfile="./CERTS/privkey.pem"     # Path to your private key
-        )
+        ssl_certfile="./CERTS/fullchain.pem",  # Correct path to the certificate
+        ssl_keyfile="./CERTS/privkey.pem"     # Correct path to the private key
+    )

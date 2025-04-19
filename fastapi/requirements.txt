@@ -8,3 +8,4 @@ html2pdf==0.1
 python-dotenv==1.0.0
 plotly==5.18.0
 networkx==3.2.1
+cryptography==44.0.2

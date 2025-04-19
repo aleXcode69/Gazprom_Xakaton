@@ -1,11 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Результаты анализа</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+        @media print {
+            .download-btn {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
+    <button class="download-btn" onclick="downloadPDF()">Скачать PDF</button>
     <div class="container">
         <h1>Результаты анализа данных: {{ filename }}</h1>
 
@@ -385,6 +412,19 @@
                 sendMessage();
             }
         });
+
+        function downloadPDF() {
+            const element = document.body;
+            const opt = {
+                margin: 1,
+                filename: 'результаты_анализа.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
     </script>
 </body>
 </html>

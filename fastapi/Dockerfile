@@ -1,4 +1,4 @@
-FROM python:3.13
+FROM --platform=linux/amd64 python:3.12-slim as build
 
 # Переназначим рабочую папку
 WORKDIR /fastapi
@@ -15,4 +15,6 @@ COPY . .
 RUN chmod +x entrypoint.sh
 
 # Запуск при старте контейнера
-ENTRYPOINT ["./entrypoint.sh"]
+
+# Запуск при старте контейнера
+ENTRYPOINT ["python", "./app.py"]
